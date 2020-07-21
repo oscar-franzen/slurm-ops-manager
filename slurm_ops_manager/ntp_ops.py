@@ -15,7 +15,7 @@ logger = logging.getLogger()
 
 
 
-class CronyOpsManager(Object):
+class ChronyOpsManager(Object):
     """Chrony OpsManager."""
 
     _state = StoredState()
