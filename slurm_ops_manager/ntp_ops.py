@@ -4,56 +4,39 @@ import logging
 import subprocess
 import sys
 
-from ops.framework import (
-    Object,
-    StoredState,
-)
 from slurm_ops_manager.utils import OPERATING_SYSTEM
 
 
-logger = logging.getLogger()
+class ChronyOpsManager:
+    """ChronyOpsManager
 
-
-
-class ChronyOpsManager(Object):
-    """Chrony OpsManager."""
-
-    _state = StoredState()
+    This class provides a public method that determines
+    the operating system and installs the 'chrony' package
+    using the appropriate package manager.
+    """
 
     def __init__(self):
-        super().__init__()
-        """Set the initial attribute values."""
-        self._state.set_default(chrony_installed=False)
+        self._logger = logging.getLogger()
 
-        self._install_chrony()
+    def install_chrony(self):
+        """Determine the operating system and install chrony."""
 
-    def _install_chrony(self):
+        pkg_mgr = ""
         if OPERATING_SYSTEM == 'ubuntu':
-            try:
-                subprocess.call([
-                    "apt",
-                    "install",
-                    "chrony",
-                    "-y",
-                ])
-            except subprocess.CalledProcessError as e:
-                logger.debug(f"Cannot install chrony - {e}")
-                sys.exit(-1)
+            pkg_mgr = "apt"
+        elif OPERATING_SYSTEM == 'centos':
+            pkg_mgr = "yum"
         else:
-            try:
-                subprocess.call([
-                    "yum",
-                    "install",
-                    "chrony",
-                    "-y",
-                ])
-            except subprocess.CalledProcessError as e:
-                logger.debug(f"Cannot install chrony - {e}")
-                sys.exit(-1)
-        self._state.chrony_installed = True
+            raise Exception(f"{OPERATING_SYSTEM} not supported")
+            sys.exit(-1)
 
-
-    @property
-    def chrony_installed(self) -> bool:
-        """Return the bool from the underlying _state."""
-        return self._state.chrony_installed
+        try:
+            subprocess.call([
+                pkg_mgr,
+                "install",
+                "chrony",
+                "-y",
+            ])
+        except subprocess.CalledProcessError as e:
+            self._logger.debug(f"Cannot install chrony - {e}")
+            sys.exit(-1)
