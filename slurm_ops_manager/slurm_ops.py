@@ -677,17 +677,6 @@ class SlurmSnapManager(SlurmOpsManagerBase):
         except subprocess.CalledProcessError as e:
             print(f"Error installing slurm snap - {e}")
 
-        # Set the snap.mode
-        try:
-            subprocess.call([
-                "snap",
-                "set",
-                "slurm",
-                f"snap.mode={self._slurm_component}",
-            ])
-        except subprocess.CalledProcessError as e:
-            print(f"Error setting snap.mode - {e}")
-
         # Create the aliases for the slurm cmds
         for cmd in self._slurm_cmds:
             try:
@@ -699,3 +688,16 @@ class SlurmSnapManager(SlurmOpsManagerBase):
                 ])
             except subprocess.CalledProcessError as e:
                 print(f"Cannot create snap alias for: {cmd} - {e}")
+
+    def restart_slurm_component(self):
+        """Restart the slurm component."""
+        # Set the snap.mode
+        try:
+            subprocess.call([
+                "snap",
+                "set",
+                "slurm",
+                f"snap.mode={self._slurm_component}",
+            ])
+        except subprocess.CalledProcessError as e:
+            print(f"Error setting snap.mode - {e}")
