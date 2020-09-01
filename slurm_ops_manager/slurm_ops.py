@@ -76,7 +76,6 @@ class SlurmOpsManager(Object):
     def render_config_and_restart(self, slurm_config) -> None:
         """Render the slurm.conf and munge key, restart slurm and munge."""
         self._write_config(slurm_config)
-        self._write_munge_key_and_restart(slurm_config['munge_key'])
         is_active = None
         try:
             is_active = subprocess.call([
@@ -122,7 +121,7 @@ class SlurmOpsManager(Object):
 
         target.write_text(rendered_template.render(ctxt))
 
-    def _write_munge_key_and_restart(self, munge_key) -> None:
+    def write_munge_key_and_restart(self, munge_key) -> None:
         key = b64decode(munge_key.encode())
         self.slurm_resource.get_munge_key_path().write_bytes(key)
 
