@@ -19,6 +19,14 @@ from slurm_ops_manager.slurm_tar_ops import SlurmTarManager
 logger = logging.getLogger()
 
 
+SLURM_PORT_MAP = {
+    "slurmctld": "6817",
+    "slurmd": "6818",
+    "slurmdbd": "6819",
+    "slurmrestd": "6820",
+}
+
+
 class SlurmOpsManager(Object):
     """Config values to install slurm."""
 
@@ -67,6 +75,7 @@ class SlurmOpsManager(Object):
     def install(self):
         """Install Slurm."""
         self.slurm_resource.install()
+        self.open_port()
 
     def get_munge_key(self) -> str:
         """Read, encode, decode and return the munge key."""
@@ -92,6 +101,16 @@ class SlurmOpsManager(Object):
             self._slurm_systemctl("start")
         version = self.slurm_resource.get_version()
         self.charm.unit.set_workload_version(version)
+
+    def _open_port(self):
+        """Run the open-port command."""
+        try:
+            subprocess.call([
+                "open-port",
+                SLURM_PORT_MAP[self._slurm_component],
+            ])
+        except subprocess.CalledProcessError as e:
+            logger.error(f"Error opening port {self._port} - {e}")
 
     def _slurm_systemctl(self, operation) -> None:
         """Start systemd services for slurmd."""
@@ -122,6 +141,7 @@ class SlurmOpsManager(Object):
         target.write_text(rendered_template.render(ctxt))
 
     def write_munge_key_and_restart(self, munge_key) -> None:
+        """Write the munge key and restart munged."""
         key = b64decode(munge_key.encode())
         self.slurm_resource.get_munge_key_path().write_bytes(key)
 
