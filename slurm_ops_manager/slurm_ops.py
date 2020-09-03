@@ -75,7 +75,7 @@ class SlurmOpsManager(Object):
     def install(self):
         """Install Slurm."""
         self.slurm_resource.install()
-        self.open_port()
+        self._open_port()
 
     def get_munge_key(self) -> str:
         """Read, encode, decode and return the munge key."""
