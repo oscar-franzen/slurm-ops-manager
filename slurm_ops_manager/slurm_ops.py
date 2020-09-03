@@ -85,20 +85,7 @@ class SlurmOpsManager(Object):
     def render_config_and_restart(self, slurm_config) -> None:
         """Render the slurm.conf and munge key, restart slurm and munge."""
         self._write_config(slurm_config)
-        is_active = None
-        try:
-            is_active = subprocess.call([
-                "systemctl",
-                "is-active",
-                self.slurm_resource.get_systemd_name(),
-            ]) == 0
-        except subprocess.CalledProcessError as e:
-            logger.error(f"Error running restarting slurm daemon - {e}")
-
-        if is_active:
-            self._slurm_systemctl("restart")
-        else:
-            self._slurm_systemctl("start")
+        self._slurm_systemctl("reload-or-restart")
         version = self.slurm_resource.get_version()
         self.charm.unit.set_workload_version(version)
 
