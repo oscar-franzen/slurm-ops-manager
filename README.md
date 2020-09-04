@@ -37,7 +37,7 @@ This function accomplishes 4 main tasks
 
 * restarts the slurm daemon
 
-* writes the munge key
+* writes munge key
 
 * restarts the munge daemon
 
