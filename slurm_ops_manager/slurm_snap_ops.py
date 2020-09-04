@@ -11,7 +11,7 @@ class SlurmSnapManager:
     _CHARM_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
     _TEMPLATE_DIR = _CHARM_DIR / 'templates'
 
-    def __init__(self, component, res_path):
+    def __init__(self, component, res_path, snap_store_channel):
         """Determine values based on component."""
         self._slurm_component = component
         self._resource = res_path
@@ -123,6 +123,7 @@ class SlurmSnapManager:
             cmd.append("--classic")
         else:
             cmd.append("slurm")
+            cmd.append(snap_store_channel)
             cmd.append("--classic")
         try:
             subprocess.call(cmd)

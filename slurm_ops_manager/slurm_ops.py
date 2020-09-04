@@ -62,7 +62,8 @@ class SlurmOpsManager(Object):
         else:
             self.slurm_resource = SlurmSnapManager(
                 component,
-                self._resource_path
+                self._resource_path,
+                self.charm.config['snap-store-channel']
             )
 
     def install(self):
