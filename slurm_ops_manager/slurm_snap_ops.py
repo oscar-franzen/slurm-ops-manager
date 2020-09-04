@@ -15,6 +15,7 @@ class SlurmSnapManager:
         """Determine values based on component."""
         self._slurm_component = component
         self._resource = res_path
+        self._channel = snap_store_channel
         if component == "slurmdbd":
             self._template_name = "slurmdbd.conf.tmpl"
             self._target = Path(
@@ -123,7 +124,7 @@ class SlurmSnapManager:
             cmd.append("--classic")
         else:
             cmd.append("slurm")
-            cmd.append(snap_store_channel)
+            cmd.append(self._channel)
             cmd.append("--classic")
         try:
             subprocess.call(cmd)
