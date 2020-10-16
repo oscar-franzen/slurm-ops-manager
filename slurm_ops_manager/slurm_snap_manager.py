@@ -115,13 +115,13 @@ class SlurmSnapManager(SlurmOpsManagerBase):
         except subprocess.CalledProcessError as e:
             print(f"Error installing slurm snap - {e}")
 
-    def upgrade(self):
+    def upgrade(self, resource):
         """Run upgrade operations."""
         logger.debug('upgrade(): entering...')
         # note: "snap refresh <foobar.snap>" does not work (it can
         # only refresh from the charm store (use "snap install"
         # instead).
-        self.setup_system()
+        self.setup_system(resource)
 
     def _provision_snap_systemd_service_override_file(self):
         override_dir = Path(
@@ -148,13 +148,16 @@ class SlurmSnapManager(SlurmOpsManagerBase):
         except subprocess.CalledProcessError as e:
             print(f"Error running daemon-reload - {e}")
 
-    def setup_system(self) -> None:
+    def setup_system(self, resource) -> None:
         """Install the slurm snap, set the snap.mode, create the aliases."""
         # Install the slurm snap from the provided resource
         # if the resource file exists and its size is > 0, otherwise
         # install the snap from the snapstore.
 
         logger.debug(f'update_snap(): _resource_path={self._resource_path}')
+
+        if not resource:
+            self._resource_path = '/lhome/ubuntu/slurm_20.02.1_amd64.resource'
 
         if self._resource_path is not None:
             resource_size = Path(self._resource_path).stat().st_size

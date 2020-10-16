@@ -117,20 +117,21 @@ class SlurmManager(Object):
                 break
             sleep(1)
 
-        self._slurm_resource_manager.setup_system()
+        self._slurm_resource_manager.setup_system(resource=False)
         self._stored.slurm_installed = True
 
-    def upgrade(self, slurm_config) -> None:
+    def upgrade(self, slurm_config, resource=True) -> None:
         """Upgrade slurm."""
         logger.debug('upgrade(): entering')
         # Pull the slurm snap from the controller on upgrade.
-        try:
-            self._stored.resource_path = str(
-                self.model.resources.fetch('slurm')
-            )
-        except ModelError as e:
-            logger.debug(e)
-        self._slurm_resource_manager.upgrade()
+        if resource:
+            try:
+                self._stored.resource_path = str(
+                    self.model.resources.fetch('slurm')
+                )
+            except ModelError as e:
+                logger.debug(e)
+        self._slurm_resource_manager.upgrade(resource)
         self.render_config_and_restart(slurm_config)
 
     def render_config_and_restart(self, slurm_config) -> None:
