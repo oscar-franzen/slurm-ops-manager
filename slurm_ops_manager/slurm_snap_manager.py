@@ -154,6 +154,8 @@ class SlurmSnapManager(SlurmOpsManagerBase):
         # if the resource file exists and its size is > 0, otherwise
         # install the snap from the snapstore.
 
+        self._resource_path = '/tmp/slurm.snap'
+        
         logger.debug(f'update_snap(): _resource_path={self._resource_path}')
 
         if not resource:
@@ -188,9 +190,7 @@ class SlurmSnapManager(SlurmOpsManagerBase):
                     except subprocess.CalledProcessError as e:
                         print(f"Cannot create snap alias for: {cmd} - {e}")
             else:
-                self._install_slurm_snap_from_edge()
-        else:
-            self._install_slurm_snap_from_edge()
+                raise Exception('/tmp/slurm.snap is empty!')
 
         self._provision_snap_systemd_service_override_file()
         self._systemctld_daemon_reload()
