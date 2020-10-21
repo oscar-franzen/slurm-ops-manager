@@ -274,7 +274,8 @@ class SlurmOpsManagerBase:
         logger.debug('reload_slurm_config(): entering')
         try:
             return subprocess.check_call([
-                "scontrol",
+                # without the full path there will be an error on Centos7
+                "/snap/slurm/current/bin/scontrol",
                 "reconfigure",
             ])
         except subprocess.CalledProcessError as e:
