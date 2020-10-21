@@ -152,9 +152,9 @@ class SlurmManager(Object):
 
         # Write slurm.conf
         self._slurm_resource_manager.write_slurm_config(slurm_config)
+        self._slurm_resource_manager.restart_munged()
         
         if restart:
-            self._slurm_resource_manager.restart_munged()
             self._slurm_resource_manager.restart_slurm_component()
             sleep(1)
         else:
