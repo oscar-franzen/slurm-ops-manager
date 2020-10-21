@@ -269,14 +269,26 @@ class SlurmOpsManagerBase:
         munge_key = self._munge_key_path.read_bytes()
         return b64encode(munge_key).decode()
 
+    def reload_slurm_config(self):
+        """Reload Slurm's configuration without restarting the service."""
+        logger.debug('reload_slurm_config(): entering')
+        try:
+            return subprocess.check_call([
+                "scontrol",
+                "reconfigure",
+            ])
+        except subprocess.CalledProcessError as e:
+            logger.error(f"scontrol exited with a non-zero exit code ({e}).")
+            return -1
+
     def restart_munged(self):
         """Restart munged."""
         try:
-            return subprocess.call([
+            return subprocess.check_call([
                 "systemctl",
                 "restart",
                 self._munged_systemd_service,
             ])
         except subprocess.CalledProcessError as e:
-            logger.error(f"Error copying systemd - {e}")
+            logger.error(f"systemctl exited with a non-zero exit code ({e})")
             return -1

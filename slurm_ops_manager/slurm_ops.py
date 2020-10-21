@@ -133,7 +133,7 @@ class SlurmManager(Object):
         self._slurm_resource_manager.upgrade()
         self.render_config_and_restart(slurm_config)
 
-    def render_config_and_restart(self, slurm_config) -> None:
+    def render_config_and_restart(self, slurm_config, restart=True) -> None:
         """Render the slurm.conf and munge key, restart slurm and munge."""
         logger.debug('render_config_and_restart(): entering')
 
@@ -146,15 +146,18 @@ class SlurmManager(Object):
             content = slurm_config['cgroup_config']
             self._slurm_resource_manager.write_cgroup_conf(content)
 
-        # Write munge.key and restart munged.
+        # Write munge.key
         self._slurm_resource_manager.write_munge_key(slurm_config['munge_key'])
-        self._slurm_resource_manager.restart_munged()
-        sleep(1)
 
-        # Write slurm.conf and restart the slurm component.
+        # Write slurm.conf
         self._slurm_resource_manager.write_slurm_config(slurm_config)
-        self._slurm_resource_manager.restart_slurm_component()
-        sleep(1)
+        
+        if restart:
+            self._slurm_resource_manager.restart_munged()
+            self._slurm_resource_manager.restart_slurm_component()
+            sleep(1)
+        else:
+            self._slurm_resource_manager.reload_slurm_config()
 
         if not self._stored.slurm_version_set:
             self._charm.unit.set_workload_version(
